@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Translator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="eyebrow" data-i18n="eyebrow"></div>
+          <h1 data-i18n="title"></h1>
+        </div>
+
+        <label class="field compact-field">
+          <span data-i18n="uiLanguageLabel"></span>
+          <select id="uiLanguage">
+            <option value="auto"></option>
+            <option value="ru"></option>
+            <option value="uk"></option>
+            <option value="en"></option>
+          </select>
+        </label>
+      </div>
+
+      <p class="subtitle" data-i18n="subtitle"></p>
+      <div class="status-chip" data-i18n="statusChip"></div>
+    </section>
+
+    <section class="card">
+      <label class="toggle">
+        <span data-i18n="enableTranslation"></span>
+        <input id="enabled" type="checkbox">
+      </label>
+
+      <label class="field">
+        <span data-i18n="targetLanguageLabel"></span>
+        <select id="targetLanguage">
+          <option value="ru"></option>
+          <option value="uk"></option>
+        </select>
+      </label>
+
+      <label class="toggle">
+        <span data-i18n="speakTranslation"></span>
+        <input id="voiceEnabled" type="checkbox">
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="section-title" data-i18n="voiceSection"></div>
+
+      <label class="field">
+        <span data-i18n="voiceOutputLabel"></span>
+        <select id="voiceUri"></select>
+      </label>
+
+      <div class="button-row">
+        <button id="previewVoice" class="btn" type="button" data-i18n="previewVoice"></button>
+        <button id="resetTuning" class="btn btn-secondary" type="button" data-i18n="resetTuning"></button>
+      </div>
+
+      <label class="field">
+        <span data-i18n="speechRateLabel"></span>
+        <input id="speechRate" type="range" min="0.75" max="1.10" step="0.01">
+        <strong id="speechRateValue">0.92x</strong>
+      </label>
+
+      <label class="field">
+        <span data-i18n="speechPitchLabel"></span>
+        <input id="speechPitch" type="range" min="0.88" max="1.06" step="0.01">
+        <strong id="speechPitchValue">0.96</strong>
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="section-title" data-i18n="overlaySection"></div>
+
+      <label class="field">
+        <span data-i18n="subtitleSizeLabel"></span>
+        <input id="fontSize" type="range" min="20" max="42" step="1">
+        <strong id="fontSizeValue">28 px</strong>
+      </label>
+
+      <label class="toggle">
+        <span data-i18n="duckVideoVolumeLabel"></span>
+        <input id="duckVideoVolume" type="checkbox">
+      </label>
+
+      <label class="field">
+        <span data-i18n="duckLevelLabel"></span>
+        <input id="duckLevel" type="range" min="0" max="0.6" step="0.05">
+        <strong id="duckLevelValue">20%</strong>
+      </label>
+
+      <label class="toggle">
+        <span data-i18n="showSourceBadgeLabel"></span>
+        <input id="showSourceBadge" type="checkbox">
+      </label>
+    </section>
+
+    <section class="note-card">
+      <p data-i18n="note"></p>
+    </section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>
