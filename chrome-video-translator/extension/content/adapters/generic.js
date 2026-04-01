@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   function createGenericAdapter() {
     const selectors = [
       '.vjs-text-track-cue',
@@ -24,7 +25,7 @@
     return { canHandle: () => true, read };
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.adapters = window.AIVTPRO.adapters || {};
-  window.AIVTPRO.adapters.generic = { createGenericAdapter };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.adapters = root.AIVTPRO.adapters || {};
+  root.AIVTPRO.adapters.generic = { createGenericAdapter };
 })();

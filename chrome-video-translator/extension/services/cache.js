@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   const memoryCache = new Map();
   const STORAGE_KEY = 'translationCacheV1';
   const TTL_MS = 1000 * 60 * 60 * 24;
@@ -39,6 +40,6 @@
     await chrome.storage.local.set({ [STORAGE_KEY]: compact });
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.cache = { loadPersistentCache, buildKey, get, set };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.cache = { loadPersistentCache, buildKey, get, set };
 })();

@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   function debounce(fn, wait) {
     let timer = 0;
     return (...args) => {
@@ -23,6 +24,6 @@
     return rect.width > 0 && rect.height > 0;
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.dom = { debounce, hashText, isVisible };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.dom = { debounce, hashText, isVisible };
 })();

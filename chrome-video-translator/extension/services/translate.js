@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   async function translateWithLibre(text, targetLanguage) {
     const response = await fetch('https://libretranslate.de/translate', {
       method: 'POST',
@@ -62,6 +63,6 @@
     return payload?.output_text?.trim() || '';
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.translate = { translateByPriority };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.translate = { translateByPriority };
 })();

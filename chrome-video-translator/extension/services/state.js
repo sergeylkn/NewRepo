@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   const DEFAULT_STATE = {
     enabled: true,
     targetLanguage: 'ru',
@@ -28,6 +29,6 @@
     return () => chrome.storage.onChanged.removeListener(listener);
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.state = { DEFAULT_STATE, loadState, saveState, subscribe };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.state = { DEFAULT_STATE, loadState, saveState, subscribe };
 })();

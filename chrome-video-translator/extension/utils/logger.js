@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   const LEVELS = { debug: 10, info: 20, warn: 30, error: 40 };
   const state = { level: 'info' };
 
@@ -17,8 +18,8 @@
     console[level === 'debug' ? 'log' : level](prefix, ...args);
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.logger = {
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.logger = {
     setLevel,
     debug: (...args) => log('debug', ...args),
     info: (...args) => log('info', ...args),

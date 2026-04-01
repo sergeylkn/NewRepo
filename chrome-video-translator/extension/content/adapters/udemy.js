@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   function createUdemyAdapter() {
     const selector = '[data-purpose="captions-cue-text"], .udlite-caption-cue';
     let lastText = '';
@@ -14,7 +15,7 @@
     return { canHandle: () => location.hostname.includes('udemy.com'), read };
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.adapters = window.AIVTPRO.adapters || {};
-  window.AIVTPRO.adapters.udemy = { createUdemyAdapter };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.adapters = root.AIVTPRO.adapters || {};
+  root.AIVTPRO.adapters.udemy = { createUdemyAdapter };
 })();

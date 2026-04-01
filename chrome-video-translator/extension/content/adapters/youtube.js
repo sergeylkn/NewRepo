@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   function createYouTubeAdapter() {
     const selector = '.ytp-caption-segment';
     let lastText = '';
@@ -14,7 +15,7 @@
     return { canHandle: () => location.hostname.includes('youtube.com'), read };
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.adapters = window.AIVTPRO.adapters || {};
-  window.AIVTPRO.adapters.youtube = { createYouTubeAdapter };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.adapters = root.AIVTPRO.adapters || {};
+  root.AIVTPRO.adapters.youtube = { createYouTubeAdapter };
 })();

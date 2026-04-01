@@ -1,4 +1,5 @@
 (() => {
+  const root = globalThis;
   let currentText = '';
 
   function chooseVoice(targetLanguage, preferredUri) {
@@ -33,6 +34,6 @@
     speechSynthesis.cancel();
   }
 
-  window.AIVTPRO = window.AIVTPRO || {};
-  window.AIVTPRO.tts = { speak, stop, chooseVoice };
+  root.AIVTPRO = root.AIVTPRO || {};
+  root.AIVTPRO.tts = { speak, stop, chooseVoice };
 })();
