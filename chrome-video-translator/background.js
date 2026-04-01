@@ -6,15 +6,22 @@ const TRANSLATOR_SETTINGS_DEFAULTS = {
 };
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type !== "translate-text") {
-    return false;
+  if (message?.type === "translate-text") {
+    translateText(message.text, message.targetLanguage || "ru")
+      .then((translatedText) => sendResponse({ ok: true, translatedText }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+
+    return true;
   }
 
-  translateText(message.text, message.targetLanguage || "ru")
-    .then((translatedText) => sendResponse({ ok: true, translatedText }))
-    .catch((error) => sendResponse({ ok: false, error: error.message }));
+  if (message?.type === "validate-gemini") {
+    validateGemini(message.apiKey, message.targetLanguage || "ru")
+      .then((result) => sendResponse({ ok: true, ...result }))
+      .catch((error) => sendResponse({ ok: false, error: error.message }));
+    return true;
+  }
 
-  return true;
+  return false;
 });
 
 async function translateText(text, targetLanguage) {
@@ -32,12 +39,13 @@ async function translateText(text, targetLanguage) {
   }
 
   let translatedText = "";
-  if (provider === "gemini" && translatorSettings.geminiApiKey.trim()) {
+  const geminiApiKey = normalizeApiKey(translatorSettings.geminiApiKey);
+  if (provider === "gemini" && geminiApiKey) {
     try {
       translatedText = await translateWithGemini(
         normalized,
         target,
-        translatorSettings.geminiApiKey.trim(),
+        geminiApiKey,
         translatorSettings.geminiModel
       );
     } catch (_error) {
@@ -55,6 +63,10 @@ async function translateText(text, targetLanguage) {
 
 function normalizeProvider(provider) {
   return provider === "gemini" ? "gemini" : "free";
+}
+
+function normalizeApiKey(value) {
+  return `${value || ""}`.replace(/\s+/g, "").trim();
 }
 
 async function translateWithGoogle(text, targetLanguage) {
@@ -78,8 +90,58 @@ async function translateWithGoogle(text, targetLanguage) {
 }
 
 async function translateWithGemini(text, targetLanguage, apiKey, geminiModel) {
-  const model = `${geminiModel || "gemini-2.0-flash"}`.trim() || "gemini-2.0-flash";
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+  const result = await queryGemini({
+    text,
+    targetLanguage,
+    apiKey,
+    geminiModel
+  });
+  return result.translatedText || "";
+}
+
+async function validateGemini(apiKey, targetLanguage) {
+  const normalizedKey = normalizeApiKey(apiKey);
+  if (!normalizedKey) {
+    throw new Error("Missing Gemini API key");
+  }
+
+  const result = await queryGemini({
+    text: targetLanguage === "uk" ? "Hello, world!" : "Привет, мир!",
+    targetLanguage,
+    apiKey: normalizedKey,
+    geminiModel: "gemini-2.0-flash"
+  });
+  return {
+    model: result.model,
+    version: result.version
+  };
+}
+
+async function queryGemini({ text, targetLanguage, apiKey, geminiModel }) {
+  const requestedModel = `${geminiModel || "gemini-2.0-flash"}`.trim() || "gemini-2.0-flash";
+  const models = Array.from(new Set([requestedModel, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"]));
+  const apiVersions = ["v1beta", "v1"];
+  const prompt = buildGeminiPrompt(text, targetLanguage);
+  let lastError = "";
+
+  for (const model of models) {
+    for (const version of apiVersions) {
+      try {
+        const translated = await requestGeminiTranslation({ prompt, model, version, apiKey });
+        if (translated) {
+          return { translatedText: translated, model, version };
+        }
+      } catch (error) {
+        lastError = error?.message || "Gemini request failed";
+      }
+    }
+  }
+
+  throw new Error(lastError || "Gemini request failed");
+}
+
+async function requestGeminiTranslation({ prompt, model, version, apiKey }) {
+  const endpoint = `https://generativelanguage.googleapis.com/${version}/models/${encodeURIComponent(model)}:generateContent`;
   const response = await fetch(`${endpoint}?key=${encodeURIComponent(apiKey)}`, {
     method: "POST",
     headers: {
@@ -93,18 +155,16 @@ async function translateWithGemini(text, targetLanguage, apiKey, geminiModel) {
       contents: [
         {
           role: "user",
-          parts: [
-            {
-              text: buildGeminiPrompt(text, targetLanguage)
-            }
-          ]
+          parts: [{ text: prompt }]
         }
       ]
     })
   });
 
   if (!response.ok) {
-    throw new Error(`Gemini request failed with ${response.status}`);
+    const payload = await safeReadJson(response);
+    const details = payload?.error?.message || payload?.error?.status || "unknown error";
+    throw new Error(`Gemini ${version}/${model} failed with ${response.status}: ${details}`);
   }
 
   const payload = await response.json();
@@ -113,6 +173,14 @@ async function translateWithGemini(text, targetLanguage, apiKey, geminiModel) {
     .join(" ")
     .trim();
   return translatedText || "";
+}
+
+async function safeReadJson(response) {
+  try {
+    return await response.json();
+  } catch (_error) {
+    return null;
+  }
 }
 
 function buildGeminiPrompt(text, targetLanguage) {
