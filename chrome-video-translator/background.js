@@ -1,4 +1,5 @@
 const translateCache = new Map();
+const geminiModelsCache = new Map();
 const TRANSLATOR_SETTINGS_DEFAULTS = {
   translationProvider: "free",
   geminiApiKey: "",
@@ -119,6 +120,7 @@ async function validateGemini(apiKey, targetLanguage) {
 
 async function queryGemini({ text, targetLanguage, apiKey, geminiModel }) {
   const requestedModel = `${geminiModel || "gemini-2.0-flash"}`.trim() || "gemini-2.0-flash";
+  const models = await getGeminiModelCandidates(apiKey, requestedModel);
   const models = Array.from(new Set([requestedModel, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"]));
   const apiVersions = ["v1beta", "v1"];
   const prompt = buildGeminiPrompt(text, targetLanguage);
@@ -138,6 +140,66 @@ async function queryGemini({ text, targetLanguage, apiKey, geminiModel }) {
   }
 
   throw new Error(lastError || "Gemini request failed");
+}
+
+async function getGeminiModelCandidates(apiKey, preferredModel) {
+  const cacheKey = normalizeApiKey(apiKey);
+  const now = Date.now();
+  const cached = geminiModelsCache.get(cacheKey);
+  if (cached && now - cached.fetchedAt < 10 * 60 * 1000) {
+    return rankGeminiModels(cached.models, preferredModel);
+  }
+
+  const discoveredModels = await discoverGeminiModels(cacheKey);
+  if (discoveredModels.length) {
+    geminiModelsCache.set(cacheKey, { models: discoveredModels, fetchedAt: now });
+    return rankGeminiModels(discoveredModels, preferredModel);
+  }
+
+  return rankGeminiModels(["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"], preferredModel);
+}
+
+function rankGeminiModels(models, preferredModel) {
+  const normalizedPreferred = `${preferredModel || ""}`.trim();
+  const ranked = Array.from(new Set(models.filter(Boolean)));
+  if (!normalizedPreferred) {
+    return ranked;
+  }
+  if (ranked.includes(normalizedPreferred)) {
+    return [normalizedPreferred, ...ranked.filter((item) => item !== normalizedPreferred)];
+  }
+  return [normalizedPreferred, ...ranked];
+}
+
+async function discoverGeminiModels(apiKey) {
+  const discovered = [];
+  for (const version of ["v1", "v1beta"]) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/${version}/models?key=${encodeURIComponent(apiKey)}`);
+      if (!response.ok) {
+        continue;
+      }
+
+      const payload = await safeReadJson(response);
+      const models = Array.isArray(payload?.models) ? payload.models : [];
+      models.forEach((modelInfo) => {
+        const supportsGenerate = Array.isArray(modelInfo?.supportedGenerationMethods)
+          && modelInfo.supportedGenerationMethods.includes("generateContent");
+        if (!supportsGenerate) {
+          return;
+        }
+        const fullName = `${modelInfo?.name || ""}`;
+        const shortName = fullName.replace(/^models\//, "").trim();
+        if (shortName) {
+          discovered.push(shortName);
+        }
+      });
+    } catch (_error) {
+      continue;
+    }
+  }
+
+  return Array.from(new Set(discovered));
 }
 
 async function requestGeminiTranslation({ prompt, model, version, apiKey }) {

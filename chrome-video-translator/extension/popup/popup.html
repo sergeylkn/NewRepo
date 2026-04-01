@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Video Translator PRO</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <main class="wrap">
+    <h1>AI Video Translator PRO</h1>
+
+    <label class="row"><span>Enabled</span><input type="checkbox" id="enabled" /></label>
+
+    <label>Language
+      <select id="targetLanguage">
+        <option value="ru">Russian</option>
+        <option value="uk">Ukrainian</option>
+        <option value="en">English</option>
+      </select>
+    </label>
+
+    <label>Provider
+      <select id="translationProvider">
+        <option value="google">Google fallback</option>
+        <option value="libre">LibreTranslate</option>
+        <option value="openai">OpenAI (optional)</option>
+      </select>
+    </label>
+
+    <label id="openAiWrap">OpenAI API Key
+      <input type="password" id="openAiApiKey" placeholder="sk-..." />
+    </label>
+
+    <div class="row">
+      <button id="testKey">Test OpenAI key</button>
+      <small id="status"></small>
+    </div>
+
+    <label class="row"><span>Voice</span><input type="checkbox" id="voiceEnabled" /></label>
+
+    <label>Voice
+      <select id="voiceUri"></select>
+    </label>
+
+    <label>Rate <input id="speechRate" type="range" min="0.75" max="1.2" step="0.01" /></label>
+    <label>Pitch <input id="speechPitch" type="range" min="0.8" max="1.2" step="0.01" /></label>
+  </main>
+  <script src="../services/state.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

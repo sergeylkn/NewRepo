@@ -6,6 +6,7 @@ This repository is prepared so you can continue the project from another compute
 
 ## Start Here
 - Source code: `chrome-video-translator/`
+- Product-ready modular build: `chrome-video-translator/extension/`
 - Build artifact (local only): `chrome-video-translator.zip`
 - Install guide: `INSTALL_RU.md`
 - Project state: `PROJECT_STATE.md`
@@ -39,7 +40,7 @@ This repository is prepared so you can continue the project from another compute
 2. Open `chrome://extensions`.
 3. Enable `Developer mode`.
 4. Click `Load unpacked`.
-5. Select the folder `chrome-video-translator`.
+5. Select the folder `chrome-video-translator/extension`.
 
 If you need ZIP installation, build it locally from `chrome-video-translator/`.
 
