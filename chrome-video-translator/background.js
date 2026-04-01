@@ -121,6 +121,7 @@ async function validateGemini(apiKey, targetLanguage) {
 async function queryGemini({ text, targetLanguage, apiKey, geminiModel }) {
   const requestedModel = `${geminiModel || "gemini-2.0-flash"}`.trim() || "gemini-2.0-flash";
   const models = await getGeminiModelCandidates(apiKey, requestedModel);
+  const models = Array.from(new Set([requestedModel, "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"]));
   const apiVersions = ["v1beta", "v1"];
   const prompt = buildGeminiPrompt(text, targetLanguage);
   let lastError = "";
