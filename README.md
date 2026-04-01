@@ -6,7 +6,8 @@ This repository is prepared so you can continue the project from another compute
 
 ## Start Here
 - Source code: `chrome-video-translator/`
-- Build artifact: `chrome-video-translator.zip`
+- Product-ready modular build: `chrome-video-translator/extension/`
+- Build artifact (local only): `chrome-video-translator.zip`
 - Install guide: `INSTALL_RU.md`
 - Project state: `PROJECT_STATE.md`
 - Rules for the next Codex: `AGENTS.md`
@@ -16,7 +17,7 @@ This repository is prepared so you can continue the project from another compute
 ## Source Of Truth
 `chrome-video-translator/` is the source of truth.
 
-`chrome-video-translator.zip` is only the packaged build for installation. If the ZIP and the source folder differ, continue from the source folder.
+`chrome-video-translator.zip` is only the packaged build for installation and is not stored in GitHub by default. If the ZIP and the source folder differ, continue from the source folder.
 
 ## What The Extension Does
 - detects caption and subtitle text on many video sites;
@@ -39,10 +40,9 @@ This repository is prepared so you can continue the project from another compute
 2. Open `chrome://extensions`.
 3. Enable `Developer mode`.
 4. Click `Load unpacked`.
-5. Select the folder `chrome-video-translator`.
+5. Select the folder `chrome-video-translator/extension`.
 
-Direct ZIP link:
-- https://github.com/sergeylkn/NewRepo/raw/master/chrome-video-translator.zip
+If you need ZIP installation, build it locally from `chrome-video-translator/`.
 
 ## Continue On Another Computer
 ```powershell
@@ -78,13 +78,13 @@ Then tell it:
 - `chrome-video-translator/popup.html` — popup markup
 - `chrome-video-translator/popup.css` — popup styles
 - `chrome-video-translator/popup.js` — multilingual popup logic and settings
-- `chrome-video-translator.zip` — packaged extension
+- `chrome-video-translator.zip` — packaged extension (generated locally, ignored in Git)
 
 ## Recommended Workflow
 1. Pull the latest state from GitHub.
 2. Edit files only inside `chrome-video-translator/`.
 3. Re-run syntax and manifest checks.
-4. Rebuild `chrome-video-translator.zip`.
+4. Rebuild `chrome-video-translator.zip` locally when needed.
 5. Commit and push changes back to GitHub.
 
 ZIP rebuild command:
