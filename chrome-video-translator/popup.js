@@ -2,6 +2,9 @@ const DEFAULT_SETTINGS = {
   enabled: true,
   uiLanguage: "auto",
   targetLanguage: "ru",
+  translationProvider: "free",
+  geminiApiKey: "",
+  geminiModel: "gemini-2.0-flash",
   voiceEnabled: true,
   voiceUri: "",
   fontSize: 28,
@@ -22,6 +25,10 @@ const I18N = {
     uiLanguageLabel: "Interface language",
     enableTranslation: "Enable translation",
     targetLanguageLabel: "Target language",
+    translationProviderLabel: "Translation engine",
+    geminiApiKeyLabel: "Gemini API key (optional)",
+    providerFree: "Free web translate",
+    providerGemini: "Gemini (my subscription)",
     speakTranslation: "Speak translation",
     voiceSection: "Voice",
     voiceOutputLabel: "Voice output",
@@ -50,6 +57,10 @@ const I18N = {
     uiLanguageLabel: "Язык интерфейса",
     enableTranslation: "Включить перевод",
     targetLanguageLabel: "Язык перевода",
+    translationProviderLabel: "Движок перевода",
+    geminiApiKeyLabel: "Gemini API key (необязательно)",
+    providerFree: "Бесплатный web-перевод",
+    providerGemini: "Gemini (моя подписка)",
     speakTranslation: "Озвучивать перевод",
     voiceSection: "Голос",
     voiceOutputLabel: "Голос озвучки",
@@ -78,6 +89,10 @@ const I18N = {
     uiLanguageLabel: "Мова iнтерфейсу",
     enableTranslation: "Увiмкнути переклад",
     targetLanguageLabel: "Мова перекладу",
+    translationProviderLabel: "Рушій перекладу",
+    geminiApiKeyLabel: "Gemini API key (необов’язково)",
+    providerFree: "Безкоштовний web-переклад",
+    providerGemini: "Gemini (моя підписка)",
     speakTranslation: "Озвучувати переклад",
     voiceSection: "Голос",
     voiceOutputLabel: "Голос озвучення",
@@ -102,6 +117,8 @@ const I18N = {
 const enabledInput = document.getElementById("enabled");
 const uiLanguageInput = document.getElementById("uiLanguage");
 const targetLanguageInput = document.getElementById("targetLanguage");
+const translationProviderInput = document.getElementById("translationProvider");
+const geminiApiKeyInput = document.getElementById("geminiApiKey");
 const voiceEnabledInput = document.getElementById("voiceEnabled");
 const voiceUriInput = document.getElementById("voiceUri");
 const previewVoiceButton = document.getElementById("previewVoice");
@@ -134,6 +151,8 @@ function bindStaticValues(settings) {
   uiLanguageInput.value = settings.uiLanguage;
   targetLanguageInput.value = settings.targetLanguage;
   voiceEnabledInput.checked = settings.voiceEnabled;
+  translationProviderInput.value = settings.translationProvider === "gemini" ? "gemini" : "free";
+  geminiApiKeyInput.value = settings.geminiApiKey || "";
   fontSizeInput.value = settings.fontSize;
   speechRateInput.value = settings.speechRate;
   speechPitchInput.value = settings.speechPitch;
@@ -152,6 +171,8 @@ function bindEvents() {
     await populateVoiceOptions(nextSettings.targetLanguage, voiceUriInput.value, nextSettings);
     await persistSettings();
   });
+  translationProviderInput.addEventListener("change", () => void persistSettings({ rerenderUi: true }));
+  geminiApiKeyInput.addEventListener("input", () => void persistSettings());
   voiceEnabledInput.addEventListener("change", () => void persistSettings());
   voiceUriInput.addEventListener("change", () => void persistSettings());
   fontSizeInput.addEventListener("input", () => void persistSettings());
@@ -182,6 +203,9 @@ function collectSettingsFromForm() {
     enabled: enabledInput.checked,
     uiLanguage: uiLanguageInput.value,
     targetLanguage: targetLanguageInput.value,
+    translationProvider: translationProviderInput.value === "gemini" ? "gemini" : "free",
+    geminiApiKey: geminiApiKeyInput.value.trim(),
+    geminiModel: "gemini-2.0-flash",
     voiceEnabled: voiceEnabledInput.checked,
     voiceUri: voiceUriInput.value,
     fontSize: Number(fontSizeInput.value),
@@ -224,6 +248,9 @@ function renderUi(settings) {
 
   setSelectOptionText(targetLanguageInput, "ru", text.optionRussian);
   setSelectOptionText(targetLanguageInput, "uk", text.optionUkrainian);
+  setSelectOptionText(translationProviderInput, "free", text.providerFree);
+  setSelectOptionText(translationProviderInput, "gemini", text.providerGemini);
+  updateProviderVisibility();
 }
 
 function setSelectOptionText(select, value, label) {
@@ -246,6 +273,15 @@ function getResolvedUiLanguage(setting) {
     return "ru";
   }
   return "en";
+}
+
+function updateProviderVisibility() {
+  const showGeminiKey = translationProviderInput.value === "gemini";
+  const field = geminiApiKeyInput.closest(".field");
+  if (!field) {
+    return;
+  }
+  field.style.display = showGeminiKey ? "flex" : "none";
 }
 
 async function populateVoiceOptions(targetLanguage, selectedVoiceUri, settings) {
