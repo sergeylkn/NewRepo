@@ -8,7 +8,8 @@
   ],
   "host_permissions": [
     "<all_urls>",
-    "https://translate.googleapis.com/*"
+    "https://translate.googleapis.com/*",
+    "https://generativelanguage.googleapis.com/*"
   ],
   "background": {
     "service_worker": "background.js"

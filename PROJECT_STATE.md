@@ -13,6 +13,7 @@ The extension is meant to work beyond YouTube. It currently targets common HTML5
 ## Current Capabilities
 - Manifest V3 extension.
 - Free translation fallback through `translate.googleapis.com`.
+- Optional Gemini translation (user API key/subscription) with automatic fallback to free web translate on failure.
 - Optional attempt to use Chrome built-in Translator API when available.
 - Overlay subtitles rendered directly over the active video.
 - Voice playback through `speechSynthesis`.
@@ -101,6 +102,9 @@ Important speech-quality decisions already implemented:
 - `uiLanguage: auto`
 - `targetLanguage: ru`
 - `voiceEnabled: true`
+- `translationProvider: free`
+- `geminiApiKey: ""`
+- `geminiModel: "gemini-2.0-flash"`
 - `voiceUri: ""`
 - `fontSize: 28`
 - `speechRate: 0.92`
